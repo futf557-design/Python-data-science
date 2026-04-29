@@ -7,11 +7,6 @@ import numpy as np
 import os
 import requests
 
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
 # ----------------------------------------------------------
 # PAGE CONFIG
 # ----------------------------------------------------------
@@ -309,15 +304,15 @@ if run_ai:
     if not user_question.strip():
         st.warning("Please enter a question or keep the default prompt.")
     else:
-        # Get Groq API key from environment variable
-        groq_api_key = os.getenv("GROQ_API_KEY")
+        # Get Groq API key from environment variable or Streamlit secrets
+        groq_api_key = os.getenv("GROQ_API_KEY") or st.secrets.get("GROQ_API_KEY")
         if not groq_api_key:
-            st.error("⚠️ GROQ_API_KEY environment variable not set. Please set it and restart.")
+            st.error("⚠️ GROQ_API_KEY is not set. Please add it as an environment variable or Streamlit secret and restart.")
             st.stop()
         
         with st.spinner("Connecting to Groq AI — analyzing your rainfall data..."):
             try:
-                model_name = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+                model_name = os.getenv("GROQ_MODEL") or st.secrets.get("GROQ_MODEL") or "llama-3.1-8b-instant"
                 response = requests.post(
                     "https://api.groq.com/openai/v1/chat/completions",
                     headers={
